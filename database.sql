@@ -1,154 +1,173 @@
-# lancer le script: source C:/Cours/P6/database.sql;
+DROP DATABASE IF EXISTS p6;
 
-CREATE DATABASE IF NOT EXISTS p6 CHARACTER SET 'utf8';
-USE p6;
+CREATE DATABASE p6
+WITH
+    OWNER = postgres
+    ENCODING = 'UTF8'
+    LC_COLLATE = 'French_France.1252'
+    LC_CTYPE = 'French_France.1252'
+    TABLESPACE = pg_default
+    CONNECTION LIMIT = -1;
 
 
+CREATE TABLE IF NOT EXISTS utilisateur(
+    nom VARCHAR(255) NOT NULL,
+    prenom VARCHAR(255) NOT NULL,
+    id SERIAL PRIMARY KEY
+);
 
-CREATE TABLE IF NOT EXISTS Caissier(
-    Nom VARCHAR(255) NOT NULL,
-    Prenom VARCHAR(255) NOT NULL,
-    Numero_Utilisateur INTEGER(10) ZEROFILL NOT NULL,
-    PRIMARY KEY (Numero_Utilisateur)
-)
-ENGINE = InnoDB;
+CREATE TABLE IF NOT EXISTS caissier(
+    nom_utilisateur VARCHAR(255) NOT NULL,
+    prenom_utilisateur VARCHAR(255) NOT NULL,
+    numero_utilisateur SERIAL PRIMARY KEY,
+    CONSTRAINT fk_nom_client
+        FOREIGN KEY (nom_utilisateur)
+        REFERENCES utilisateur(prenom),
+    CONSTRAINT fk_prenom_client
+        FOREIGN KEY (prenom_utilisateur)
+        REFERENCES utilisateur(prenom)
+);
 
-CREATE TABLE IF NOT EXISTS Livreur(
-    Nom VARCHAR(255) NOT NULL,
-    Prenom VARCHAR(255) NOT NULL,
-    Numero_Utilisateur INTEGER(10) ZEROFILL NOT NULL,
-    PRIMARY KEY (Numero_Utilisateur)
-)
-ENGINE = InnoDB DEFAULT CHARSET = utf8;
+CREATE TABLE IF NOT EXISTS livreur(
+    nom_utilisateur VARCHAR(255) NOT NULL,
+    prenom_utilisateur VARCHAR(255) NOT NULL,
+    numero_utilisateur SERIAL PRIMARY KEY,
+    CONSTRAINT fk_nom_client
+        FOREIGN KEY (nom_utilisateur)
+        REFERENCES utilisateur(prenom),
+    CONSTRAINT fk_prenom_client
+        FOREIGN KEY (prenom_utilisateur)
+        REFERENCES utilisateur(prenom)
+);
 
-CREATE TABLE IF NOT EXISTS Pizzaiolo(
-    Nom VARCHAR(255) NOT NULL,
-    Prenom VARCHAR(255) NOT NULL,
-    Numero_Utilisateur INTEGER(10) ZEROFILL NOT NULL,
-    PRIMARY KEY (Numero_Utilisateur)
-)
-ENGINE = InnoDB;
+CREATE TABLE IF NOT EXISTS pizzaiolo(
+    nom_utilisateur VARCHAR(255) NOT NULL,
+    prenom_utilisateur VARCHAR(255) NOT NULL,
+    numero_utilisateur SERIAL PRIMARY KEY,
+    CONSTRAINT fk_nom_client
+        FOREIGN KEY (nom_utilisateur)
+        REFERENCES utilisateur(prenom),
+    CONSTRAINT fk_prenom_client
+        FOREIGN KEY (prenom_utilisateur)
+        REFERENCES utilisateur(prenom)
+);
 
-CREATE TABLE IF NOT EXISTS Client(
-    Nom VARCHAR(255) NOT NULL,
-    Prenom VARCHAR(255) NOT NULL,
-    Numero_Utilisateur INTEGER(10) ZEROFILL NOT NULL,
-    PRIMARY KEY (Numero_Utilisateur)
-)
-ENGINE = InnoDB;
+CREATE TABLE IF NOT EXISTS client(
+    nom_client VARCHAR(255) NOT NULL,
+    prenom_client VARCHAR(255) NOT NULL,
+    numero_utilisateur SERIAL PRIMARY KEY,
+    CONSTRAINT fk_nom_client
+        FOREIGN KEY (nom_client)
+        REFERENCES utilisateur(prenom),
+    CONSTRAINT fk_prenom_client
+        FOREIGN KEY (prenom_client)
+        REFERENCES utilisateur(prenom)
+);
 
-CREATE TABLE IF NOT EXISTS Information(
-    Rue VARCHAR(255) NOT NULL,
-    Ville VARCHAR (255) NOT NULL,
-    Code_Postal SMALLINT (5) NOT NULL,
-    Information_Complementaire VARCHAR (255) NOT NULL,
-    Adresse_Email VARCHAR(255) NOT NULL,
-    Numero_Utilisateur INTEGER(10) ZEROFILL,
-    Id SMALLINT(10) NOT NULL AUTO_INCREMENT,
-    PRIMARY KEY (Id),
+CREATE TABLE IF NOT EXISTS information_utilisateur(
+    nom VARCHAR(255) NOT NULL,
+    prenom VARCHAR(255) NOT NULL,
+    id SERIAL PRIMARY KEY
+);
+
+CREATE TABLE IF NOT EXISTS information(
+    rue VARCHAR(255) NOT NULL,
+    ville VARCHAR (255) NOT NULL,
+    code_postal INT NOT NULL,
+    information_complementaire VARCHAR (255) NOT NULL,
+    adresse_email VARCHAR(255) NOT NULL,
+    numero_utilisateur INT NOT NULL,
+    id SERIAL PRIMARY KEY,
     CONSTRAINT fk_numero_utilisateur
-        FOREIGN KEY (Numero_Utilisateur)
-        REFERENCES Client(Numero_Utilisateur)
-)
-ENGINE = InnoDB DEFAULT CHARSET = utf8;
+        FOREIGN KEY (numero_utilisateur)
+        REFERENCES client(numero_utilisateur)
+);
 
-CREATE TABLE IF NOT EXISTS Commande(
-    Date_Time DATETIME NOT NULL,
-    Etat_Paiement VARCHAR(6),
-    Statut_Commande VARCHAR(20),
-    Numero_De_Commande INTEGER(10) ZEROFILL NOT NULL AUTO_INCREMENT,
-    Livreur_Numero_Utilisateur INTEGER(10),
-    Client_Numero_Utilisateur INTEGER(10),
-    Caissier_Numero_Utilisateur INTEGER(10),
-    Pizzaiolo_Numero_Utilisateur INTEGER(10),
-    PRIMARY KEY (Numero_De_Commande),
-    CONSTRAINT fk_Livreur_Numero_Utilisateur
-        FOREIGN KEY (Livreur_Numero_Utilisateur)
-        REFERENCES Livreur(Numero_Utilisateur),
-    CONSTRAINT fk_Client_Numero_Utilisateur
-        FOREIGN KEY (Client_Numero_Utilisateur)
-        REFERENCES Client(Numero_Utilisateur),
-    CONSTRAINT fk_Caissier_Numero_Utilisateur
-        FOREIGN KEY (Caissier_Numero_Utilisateur)
-        REFERENCES Caissier(Numero_Utilisateur),
-    CONSTRAINT fk_Pizzaiolo_Numero_Utilisateur
-        FOREIGN KEY (Pizzaiolo_Numero_Utilisateur)
-        REFERENCES Pizzaiolo(Numero_Utilisateur)
-)
-ENGINE = InnoDB DEFAULT CHARSET = utf8;
+CREATE TABLE IF NOT EXISTS commande(
+    date_time timestamp NOT NULL,
+    etat_paiement VARCHAR(6),
+    statut_commande VARCHAR(20),
+    numero_de_commande SERIAL PRIMARY KEY ,
+    livreur_numero_utilisateur INT,
+    client_numero_utilisateur INT,
+    caissier_numero_utilisateur INT,
+    pizzaiolo_numero_utilisateur INT,
+    CONSTRAINT fk_livreur_numero_utilisateur
+        FOREIGN KEY (livreur_numero_utilisateur)
+        REFERENCES livreur(numero_utilisateur),
+    CONSTRAINT fk_client_numero_utilisateur
+        FOREIGN KEY (client_numero_utilisateur)
+        REFERENCES client(numero_utilisateur),
+    CONSTRAINT fk_caissier_numero_utilisateur
+        FOREIGN KEY (caissier_numero_utilisateur)
+        REFERENCES caissier(numero_utilisateur),
+    CONSTRAINT fk_pizzaiolo_numero_utilisateur
+        FOREIGN KEY (pizzaiolo_numero_utilisateur)
+        REFERENCES pizzaiolo(numero_utilisateur)
+);
 
-CREATE TABLE IF NOT EXISTS Restaurant(
-    Nom_Restaurant VARCHAR(255) NOT NULL,
-    Id INTEGER(10) NOT NULL AUTO_INCREMENT,
-    PRIMARY KEY (Id)
-)
-ENGINE = InnoDB;
+CREATE TABLE IF NOT EXISTS restaurant(
+    nom_restaurant VARCHAR(255) NOT NULL,
+    id SERIAL PRIMARY KEY
+);
 
-CREATE TABLE IF NOT EXISTS Ingredient(
-    Nom VARCHAR(255)NOT NULL,
-    Description VARCHAR(255) NOT NULL,
-    Id INTEGER(10) NOT NULL AUTO_INCREMENT,
-    PRIMARY KEY (Id)
-)
-ENGINE = InnoDB;
+CREATE TABLE IF NOT EXISTS ingredient(
+    nom VARCHAR(255)NOT NULL,
+    description VARCHAR(255) NOT NULL,
+    id SERIAL PRIMARY KEY
+);
 
-CREATE TABLE IF NOT EXISTS Pizza(
-    Nom VARCHAR(255) NOT NULL,
-    Statut VARCHAR(20) NOT NULL,
-    Recette VARCHAR(255) NOT NULL,
-    Id INTEGER(10) NOT NULL AUTO_INCREMENT,
-    PRIMARY KEY (Id)
-)
-ENGINE = InnoDB;
+CREATE TABLE IF NOT EXISTS pizza(
+    nom VARCHAR(255) NOT NULL,
+    statut VARCHAR(20) NOT NULL,
+    recette VARCHAR(255) NOT NULL,
+    id SERIAL PRIMARY KEY
+);
 
-CREATE TABLE IF NOT EXISTS Pizza_Commande(
-    Quantite INTEGER(10) NOT NULL,
-    Date DATETIME,
-    Pizza_Id INTEGER(10),
-    Commande_Numero_De_Commande INTEGER(10),
-    CONSTRAINT fk_Pizza_Id
-        FOREIGN KEY (Pizza_Id)
-        REFERENCES Pizza(Id),
-    CONSTRAINT fk_Commande_Numero_De_Commande
-        FOREIGN KEY (Commande_Numero_De_Commande)
-        REFERENCES Commande(Numero_De_Commande)
-)
-ENGINE = InnoDB;
+CREATE TABLE IF NOT EXISTS pizza_commande(
+    quantite INT NOT NULL,
+    date date,
+    pizza_id INT,
+    commande_numero_de_commande INT,
+    CONSTRAINT fk_pizza_id
+        FOREIGN KEY (pizza_id)
+        REFERENCES pizza(id),
+    CONSTRAINT fk_commande_numero_de_commande
+        FOREIGN KEY (commande_numero_de_commande)
+        REFERENCES commande(numero_de_commande)
+);
 
-CREATE TABLE IF NOT EXISTS Pizza_Restaurant(
-    Pizza_Id INTEGER(10),
-    Restaurant_Id INTEGER(10),
-    CONSTRAINT fk_Pizza_Id
-        FOREIGN KEY (Pizza_Id)
-        REFERENCES Pizza(Id),
-    CONSTRAINT fk_Restaurant_Id
-        FOREIGN KEY (Restaurant_Id)
-        REFERENCES Restaurant(Id)
-)
-ENGINE = InnoDB;
+CREATE TABLE IF NOT EXISTS pizza_restaurant(
+    pizza_id INT,
+    restaurant_id INT,
+    CONSTRAINT fk_pizza_id
+        FOREIGN KEY (pizza_id)
+        REFERENCES pizza(id),
+    CONSTRAINT fk_restaurant_id
+        FOREIGN KEY (restaurant_id)
+        REFERENCES restaurant(id)
+);
 
-CREATE TABLE IF NOT EXISTS Ingredient_Restaurant(
-    Quantite INTEGER(10),
-    Date DATETIME,
-    Ingredient_Id INTEGER(10),
-    Restaurant_Id INTEGER(10),
-    CONSTRAINT fk_Ingredient_Id
-        FOREIGN KEY (Ingredient_Id)
-        REFERENCES Ingredient(Id),
-    CONSTRAINT fk_Restaurant_Id
-        FOREIGN KEY (Restaurant_Id)
-        REFERENCES Restaurant(Id)
-)
-ENGINE = InnoDB;
+CREATE TABLE IF NOT EXISTS ingredient_restaurant(
+    quantite INT,
+    date date,
+    ingredient_id INT,
+    restaurant_id INT,
+    CONSTRAINT fk_ingredient_id
+        FOREIGN KEY (ingredient_id)
+        REFERENCES ingredient(id),
+    CONSTRAINT fk_restaurant_id
+        FOREIGN KEY (restaurant_id)
+        REFERENCES restaurant(id)
+);
 
-CREATE TABLE IF NOT EXISTS Pizza_Ingredient(
-    Pizza_Id INTEGER(10),
-    Ingredient_Id INTEGER(10),
-    CONSTRAINT fk_Pizza_Id
-        FOREIGN KEY (Pizza_Id)
-        REFERENCES Pizza(Id),
-    CONSTRAINT fk_Ingredient_Id
-        FOREIGN KEY (Ingredient_Id)
-        REFERENCES Ingredient(Id)
-)
-ENGINE = InnoDB;
+CREATE TABLE IF NOT EXISTS pizza_ingredient(
+    pizza_id INT,
+    ingredient_id INT,
+    CONSTRAINT fk_pizza_id
+        FOREIGN KEY (pizza_id)
+        REFERENCES pizza(id),
+    CONSTRAINT fk_ingredient_id
+        FOREIGN KEY (ingredient_id)
+        REFERENCES ingredient(id)
+);
